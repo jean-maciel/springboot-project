@@ -14,8 +14,8 @@ public class StudentConfig {
     @Bean
     CommandLineRunner commandLineRunner(StudentRepository repository) {
         return args -> {
-            Student alice = new Student(1L, "Alice", 21, "Computer Science");
-            Student delilah = new Student("Delilah", 21, "Computer Science");
+            Student alice = new Student("Alice", "alice@gmail.com", 21, "Computer Science");
+            Student delilah = new Student("Delilah", "delilah@gmail.com", 21, "Computer Science");
             repository.saveAll(List.of(delilah, alice));
         };
     }
