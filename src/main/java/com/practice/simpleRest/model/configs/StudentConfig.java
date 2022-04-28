@@ -11,12 +11,12 @@ import java.util.List;
 @Configuration
 public class StudentConfig {
 
-    @Bean
+/*    @Bean
     CommandLineRunner commandLineRunner(StudentRepository repository) {
         return args -> {
             Student alice = new Student("Alice", "alice@gmail.com", 21, "Computer Science");
             Student delilah = new Student("Delilah", "delilah@gmail.com", 21, "Computer Science");
             repository.saveAll(List.of(delilah, alice));
         };
-    }
+    }*/
 }
