@@ -1,7 +1,10 @@
 package com.practice.simpleRest.service;
 
+import com.practice.simpleRest.exception.EmailAlreadyTakenException;
+import com.practice.simpleRest.exception.StudentIdDoesNotExistException;
 import com.practice.simpleRest.model.entities.Student;
 import com.practice.simpleRest.model.repositories.StudentRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +14,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class StudentService {
 
     private final StudentRepository studentRepository;
-    
+
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
@@ -23,28 +27,29 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public Student addNewStudent(Student student) {
+    public Student addNewStudent(Student student) throws EmailAlreadyTakenException {
         Optional<Student> studentOptional = studentRepository.findStudentByEmail(student.getEmail());
         if (studentOptional.isPresent()) {
-            throw new IllegalStateException("Email taken");
+            log.error("Error adding new student.");
+            throw new EmailAlreadyTakenException();
         }
         studentRepository.save(student);
         return student;
     }
 
-    public Student deleteStudent(Long studentId) {
+    public Student deleteStudent(Long studentId) throws StudentIdDoesNotExistException {
         boolean exists = studentRepository.existsById(studentId);
-        Student deletedStudent = studentRepository.findById(studentId).get();
         if (!exists) {
-            throw new IllegalStateException("Student with id" + studentId + "does not exists");
+            throw new StudentIdDoesNotExistException();
         }
+        Student deletedStudent = studentRepository.findById(studentId).get();
         studentRepository.deleteById(studentId);
         return deletedStudent;
     }
 
     @Transactional
-    public Student updateStudent(Long studentId, String name, String email) {
-        Student student = studentRepository.findById(studentId).orElseThrow(() -> new IllegalStateException("Student with id" + studentId + "does not exist"));
+    public Student updateStudent(Long studentId, String name, String email) throws StudentIdDoesNotExistException {
+        Student student = studentRepository.findById(studentId).orElseThrow(StudentIdDoesNotExistException::new);
 
         if (name != null && name.length() > 0 && !Objects.equals(student.getName(), name)) {
             student.setName(name);
